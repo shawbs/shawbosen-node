@@ -37,6 +37,9 @@ ActricleSchema.statics = {
             _id: id
         })
         .exec(cb)
+    },
+    removeById: function(id,cb){
+        return this.remove({_id:id}).exec(cb)
     }
 }
 

@@ -43,7 +43,7 @@ const getJwt = function(hours){
     hours = hours || 1;
     let token = jwt.sign(
         {
-            content:'sg小说书库',
+            content:'shawbosen',
             iat:Math.floor(Date.now() / 1000) + (60 * 60),
         }, md5(secret),
         {

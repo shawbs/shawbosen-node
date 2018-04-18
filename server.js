@@ -6,19 +6,21 @@ const bodyParser = require('body-parser');
 
 const _ = require('underscore');
 
-const conf = require('./public/config/conf');
+const conf = require(path.resolve(__dirname, 'config.js'));
 const url = conf.path;
 const port = process.env.PORT || conf[conf.env].port;
 
 app.locals.moment = require('moment')
 
 const mongoose = require('mongoose');
-mongoose.connect(conf.db.url);
+mongoose.connect('mongodb://localhost:27017/shawbosen');
+const db = mongoose.connection;
+db.on('error', function(err){
+    console.error(err)
+})
 
-// app.set('views', path.join(__dirname,'src'));
-// app.set('view engine', 'ejs');
-// //静态资源请求路径
-// app.use(express.static(path.join(__dirname)));
+
+
 
 // 添加json解析中间件
 app.use(bodyParser.json());

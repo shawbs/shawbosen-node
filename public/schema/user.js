@@ -2,12 +2,27 @@
 const Mongoose = require('mongoose')
 
 const UserSchema = new Mongoose.Schema({
-    username: String,
-    password: String,
-    nickname: String,
+    username: {
+        type: String,
+        default: ''
+    },
+    password: {
+        type: String,
+        default: ''
+    },
+    nickname: {
+        type: String,
+        default: ''
+    },
     startWorkDate: Date,
-    desc: String,
-    avatar: String,
+    desc: {
+        type: String,
+        default: ''
+    },
+    avatar: {
+        type: String,
+        default: ''
+    },
     meta: {
         createAt: {
             type: Date,
@@ -37,6 +52,12 @@ UserSchema.statics = {
     fetchById: function(id,cb){
         return this.findOne({
             _id: id
+        })
+        .exec(cb)
+    },
+    fetchByUsername: function(username,cb){
+        return this.findOne({
+            username: username
         })
         .exec(cb)
     }

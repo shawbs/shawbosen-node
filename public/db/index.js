@@ -1,8 +1,9 @@
  
- const MongoClient = require('mongodb').MongoClient;
- const db_conf = require('../config/conf').db;
+const path = require('path');
+const MongoClient = require('mongodb').MongoClient;
+const db_conf = require(path.resolve(__dirname, 'config.js')).db;
 
- const connect = function(){
+const connect = function(){
     return new Promise((resolve,reject)=>{
         MongoClient.connect(db_conf.url, function(err, client){
             if(err){  
@@ -14,7 +15,7 @@
             }
         })
     })
- }
+}
 
- module.exports = connect
+module.exports = connect
 
