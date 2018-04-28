@@ -16,5 +16,6 @@ module.exports = {
         dbName: 'shawbosen',
         username: 'sgdy',
         password: 'sgdy'
-    }
+    },
+    secret: 'shawbosen$%^'
 }

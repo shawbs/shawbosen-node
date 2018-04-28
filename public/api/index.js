@@ -44,7 +44,6 @@ function addController(route,dir){
 
 
 module.exports = function(app){
-	console.log('GET /');
 
 	addController(app,__dirname);
 		

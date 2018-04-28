@@ -5,7 +5,15 @@ const ActricleSchema = new Mongoose.Schema({
     title: String,
     tag: String,
     content: String,
-    author: String,
+    author: {
+        type: String,
+        default: 'sgdy'
+    },
+    tagColor: String,
+    private: {
+        type: Boolean,
+        default: false
+    },
     meta: {
         createAt: {
             type: Date,
@@ -30,13 +38,19 @@ ActricleSchema.pre('save', function(next){
 
 ActricleSchema.statics = {
     fetch: function(cb){
-        return this.find({}).sort('meta.updateAt').exec(cb)
+        return this.find({}).sort({'meta.updateAt':-1}).exec(cb)
+    },
+    fetchColumn: function(option,cb){
+        return this.find({},option).exec(cb)
     },
     fetchById: function(id,cb){
         return this.findOne({
             _id: id
         })
         .exec(cb)
+    },
+    fetchBy: function(option, cb){
+        return this.find(option).exec(cb)
     },
     removeById: function(id,cb){
         return this.remove({_id:id}).exec(cb)

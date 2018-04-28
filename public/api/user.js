@@ -1,12 +1,18 @@
+const Mode = require('../serve/result')
+
 
 /**
 *	user api
 */
 const result = require('../script/result');
 
-const  util = require('../script/common');
+const  JWT = require('../script/mJWT');
 
 const User = require('../model/user');
+
+const conf = require('../../config');
+
+const util = require('../script/util');
 
 /**
  * 用户注册接口
@@ -33,9 +39,10 @@ const register = function(req,res){
         if( !res_user ){
             user.save((err,_user)=>{
                 if(err) return console.error(err)
+
                 let data = {
                     code: 200,
-                    data:{user:user}
+                    data:{isSuccess:true}
                 }
                 res.json(result.sucess(data))
             })
@@ -56,8 +63,9 @@ const login = function(req,res){
         }else{
             if(password == res_user.password){
                 res.json(result.sucess({
-                    data:{user:res_user},
-                    token: util.getJwt()
+                    data:{user:new Mode.User(res_user)},
+                    token: JWT.getToken(),
+                    refresh_token: JWT.encryptToken(conf.secret)
                 }))
             }else{
                 res.json(result.failed({msg:'密码错误'}))
@@ -73,34 +81,43 @@ const login = function(req,res){
  * @param {any} res 
  */
 const refreshAccessToken = function(req,res){
-	let {accessToken} = req.body;
-	let {decoded,exType} = util.verifyToken(accessToken);
-	let _token = util.getJwt();
-	if(exType.exType == 1 || exType.exType == 2){
-        res.json({state:true,token: _token, message:''})
-    }else{
-        res.json({state:false,message:'入参错误'});
-    }	
-}
+    let refreshToken = req.body.refreshToken;
+    if(refreshToken){
+        let {decoded,exType} = JWT.decodeToken(refreshToken);
+        
+        if(decoded.content == conf.secret){
+            let _token = JWT.getToken();
+            res.json(result.sucess({data:{token: _token}}))
+        }else{
+            res.json(result.failed({msg:'token错误'}));
+        }
 
-/**
- * 添加token验证路由,添加到需要验证的路由中间件中
- * @param {*} req 
- * @param {*} res 
- */
-const httpVerifyToken = function(req,res){
-	let {accessToken} = req.body;
-	let {decoded,exType} = util.verifyToken(accessToken);
-    if(exType != 1){
-        res.json(result.failed({message:'invalid token'}))
     }else{
-        res.next();
+        res.json(result.failed({msg:'没有提供token'}))
     }
+	
 }
 
+const verifyToken = function(req,res,next){
+    let accessToken = req.body.accessToken || req.query.accessToken ||req.headers['x-access-token'];
+    if(accessToken){
+        let {decoded,exType} = JWT.decodeToken(accessToken);
+        if(exType == 1){
+            res.json(result.sucess({data:{token: JWT.getToken() }, token_status: 1}))
+        }else if(exType == 2){
+            res.json(result.failed({msg:'token已过期',token_status: 2}))
+        }else{
+            res.json(result.failed({msg:'无效token',token_status: 3}))
+        }
+    }else{
+        res.json(result.failed({msg:'没有提供token'}))
+    }
+	
+}
 
 module.exports = {
-    'POST /shawbosen/register': register,
-    'POST /shawbosen/login': login,
-	'POST /shawbosen/refreshAccessToken': refreshAccessToken,
+    'POST /shawbosen/user/register': register,
+    'POST /shawbosen/user/login': login,
+    'POST /shawbosen/refreshAccessToken': refreshAccessToken,
+    'POST /shawbosen/verifyToken': verifyToken
 }
