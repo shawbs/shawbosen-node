@@ -41,7 +41,6 @@ const register = function(req,res){
                 if(err) return console.error(err)
 
                 let data = {
-                    code: 200,
                     data:{isSuccess:true}
                 }
                 res.json(result.sucess(data))
@@ -53,9 +52,14 @@ const register = function(req,res){
     
 }
 
+/**
+ * 登录
+ * @param {*} req 
+ * @param {*} res 
+ */
 const login = function(req,res){
     let {username,password} = req.body;
-
+    
     User.fetchByUsername(username,(err,res_user)=>{
         if(err) return console.error(err)
         if( !res_user ){
@@ -65,7 +69,7 @@ const login = function(req,res){
                 res.json(result.sucess({
                     data:{user:new Mode.User(res_user)},
                     token: JWT.getToken(),
-                    refresh_token: JWT.encryptToken(conf.secret)
+                    refresh_token: JWT.getRefreshtoken()
                 }))
             }else{
                 res.json(result.failed({msg:'密码错误'}))
@@ -73,6 +77,62 @@ const login = function(req,res){
             
         }
     })
+}
+
+/**
+ * 获取用户资料
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getUserInfo = function(req,res){
+    let {username} = req.body || req.query;
+    
+    User.fetchByUsername(username,(err,res_user)=>{
+        if(err) return console.error(err)
+        if( !res_user ){
+            res.json(result.failed({msg:'用户不存在'}))
+        }else{
+
+            res.json(result.sucess({
+                data:{user:new Mode.User(res_user)}
+            }))
+
+            
+        }
+    })
+}
+
+/**
+ * 用户资料修改
+ * @param {*} req 
+ * @param {*} res 
+ */
+const UserInfoUpdata = function(req,res){
+    let {id,nickname,startWorkDate,desc} = req.body;
+
+    let user = new User({
+        nickname: nickname,
+        startWorkDate: startWorkDate,
+        desc: desc
+    })
+
+    if(id){
+        User.fetchById(id,(err,res_user)=>{
+            assert.ifError(err);
+            if( !res_user ){
+                res.json(result.failed({msg:'用户不存在'}))
+            }else{
+                let _user = Object(res_user, user);
+                _user.save((err,user)=>{
+                    assert.ifError(err);
+                    res.json(result.sucess({data:{isSuccess:true},msg:'更新成功'}))
+                })
+                
+            }
+        })
+    }else{
+        res.json(result.failed({msg:'无效的用户名ID'}))
+    }
 }
 
 /**
@@ -85,9 +145,15 @@ const refreshAccessToken = function(req,res){
     if(refreshToken){
         let {decoded,exType} = JWT.decodeToken(refreshToken);
         
-        if(decoded.content == conf.secret){
+        if(exType != 3){
             let _token = JWT.getToken();
-            res.json(result.sucess({data:{token: _token}}))
+            res.json(result.sucess({
+                    data:{
+                        token: _token,
+                        refresh_token:JWT.getRefreshtoken()
+                    }
+                })
+            )
         }else{
             res.json(result.failed({msg:'token错误'}));
         }
@@ -99,15 +165,15 @@ const refreshAccessToken = function(req,res){
 }
 
 const verifyToken = function(req,res,next){
-    let accessToken = req.body.accessToken || req.query.accessToken ||req.headers['x-access-token'];
-    if(accessToken){
-        let {decoded,exType} = JWT.decodeToken(accessToken);
+    let accesstoken = req.body.accesstoken ||req.headers['accesstoken'];
+    if(accesstoken){
+        let {decoded,exType} = JWT.decodeToken(accesstoken);
         if(exType == 1){
-            res.json(result.sucess({data:{token: JWT.getToken() }, token_status: 1}))
+            res.json(result.sucess({msg:'token有效'}))
         }else if(exType == 2){
-            res.json(result.failed({msg:'token已过期',token_status: 2}))
+            res.json(result.failed({code:401,msg:'token已过期'}))
         }else{
-            res.json(result.failed({msg:'无效token',token_status: 3}))
+            res.json(result.failed({msg:'无效token'}))
         }
     }else{
         res.json(result.failed({msg:'没有提供token'}))

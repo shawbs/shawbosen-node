@@ -7,18 +7,48 @@ const secret = md5('sgdy$');
  * @param {number} hours 
  */
 const getToken = function(hours){
-    hours = hours || 1;
+    hours = hours || 10;
     let token = jwt.sign(
         {
             content:'shawbosen',
             iat:Math.floor(Date.now() / 1000) + (60 * 60),
         }, md5(secret),
         {
-            // expiresIn:hours*60*60 //1小时到期
-            expiresIn: 1000 //10分钟到期
+            expiresIn:hours*60 //10分钟到期
         }
     )
     return token;
+}
+
+/**
+ * 生成refreshtoken
+ * @param {number} hours 
+ */
+const getRefreshtoken = function(hours){
+    hours = hours || 10;
+    let token = jwt.sign(
+        {
+            content: "refreshtoken",
+            iat:Math.floor(Date.now() / 1000) + (60 * 60),
+        }, md5(secret),
+        {
+            expiresIn:hours*60 + 60 //11分钟到期
+        }
+    )
+    return token;
+}
+
+/**
+ * 加密
+ * @param {*} key 要加密的KEY
+ */
+const encryptToken = function(key){
+    return jwt.sign(
+        {
+            content: key,
+            iat:Math.floor(Date.now() / 1000) + (60 * 60),
+        }, md5(secret)
+    )
 }
 
 /**
@@ -47,23 +77,12 @@ const decodeToken = function(token){
     return {decoded,exType};
 }
 
-/**
- * 加密
- * @param {*} key 要加密的KEY
- */
-const encryptToken = function(key){
-    return jwt.sign(
-        {
-            content: key,
-            iat:Math.floor(Date.now() / 1000) + (60 * 60),
-        }, md5(secret)
-    )
-}
 
 
 
 module.exports = {
     decodeToken,
     getToken,
+    getRefreshtoken,
     encryptToken
 }

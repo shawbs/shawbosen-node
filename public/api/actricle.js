@@ -82,7 +82,9 @@ const getActricleAll = function(req,res){
         assert.ifError(err);
         let actricleList = [];
         for(let item of actricle){
-            actricleList.push(new Mode.Article(item)) 
+            let _actricle = new Mode.Article(item);
+            delete _actricle.content;
+            actricleList.push(_actricle) 
         }
         res.json(result.sucess({ data: { actricle: actricleList } }))
     })
@@ -98,7 +100,11 @@ const getActricleById = function(req, res){
     let {actricleId} = req.query;
     Actricle.fetchById(actricleId, (err, actricle)=>{
         assert.ifError(err);
-        res.json(result.sucess({data:{actricle: new Mode.Article(actricle)}}))
+        if(actricle){
+            res.json(result.sucess({data:{actricle: new Mode.Article(actricle)}}))
+        }else{
+            res.json(result.failed({msg:'查无此id'}))
+        }
     })
 }
 
@@ -132,19 +138,33 @@ const getTags = function(req,res){
  */
 const getActricleByTag = function(req, res){
     let {tag} = req.body;
-    Actricle.fetchBy({tag: tag}, (err,data)=>{
-        assert.ifError(err)
-        let actricleList = [];
-        for(let item of data){
-            actricleList.push(new Mode.Article(item)) 
-        }
-
-        res.json(result.sucess({
-            data:{
-                actricle: actricleList
+    if(tag){
+        Actricle.fetchBy({tag: tag}, (err,data)=>{
+            assert.ifError(err)
+            let actricleList = [];
+            for(let item of data){
+                let _actricle = new Mode.Article(item);
+                delete _actricle.content;
+                actricleList.push(_actricle) 
             }
-        }))
-    })
+            res.json(result.sucess({
+                data:{
+                    actricle: actricleList
+                }
+            }))
+        })
+    }else{
+        Actricle.fetch((err,actricle)=>{
+            assert.ifError(err);
+            let actricleList = [];
+            for(let item of actricle){
+                let _actricle = new Mode.Article(item);
+                delete _actricle.content;
+                actricleList.push(_actricle) 
+            }
+            res.json(result.sucess({ data: { actricle: actricleList } }))
+        })
+    }
 }
 
 /**
@@ -173,7 +193,9 @@ const getActricleGroupByTag = function(req, res){
                 let _arr = [];
                 for(let i=0;i<articleList.length;i++){
                     if(articleList[i].tag == tag){
-                        _arr.push(new Mode.Article(articleList[i]))
+                        let o =new Mode.Article(articleList[i]);
+                        delete o.content;
+                        _arr.push(o);
                     }
                     if(i == articleList.length-1){
                         o[tag] = _arr;

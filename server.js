@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({
 
 app.all('*', function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "x-requested-with,content-type");
+    res.header("Access-Control-Allow-Headers", "x-requested-with,content-type,accessToken");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
     // res.header("X-Powered-By",' 3.2.1')
     // res.header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");

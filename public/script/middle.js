@@ -6,13 +6,13 @@ const result = require('../script/result');
  * @param {*} res 
  */
 const MiddleVerifyToken = function(req,res,next){
-    let accessToken = req.body.accessToken || req.query.accessToken ||req.headers['x-access-token'];
+    let accessToken = req.headers['accesstoken'];
     if(accessToken){
         let {decoded,exType} = JWT.decodeToken(accessToken);
         if(exType == 1){
             next();
         }else if(exType == 2){
-            res.json(result.failed({msg:'token已过期',refreshAccess: 1}))
+            res.json(result.failed({code:401,msg:'token已过期'}))
         }else{
             res.json(result.failed({msg:'无效token'}))
         }
