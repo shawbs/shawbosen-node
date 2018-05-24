@@ -45,9 +45,12 @@ function addController(route,dir){
 
 module.exports = function(app){
 
+	app.get('/',function(req,res){
+		res.end('index')
+	})
+	
 	addController(app,__dirname);
-		
-	console.log('GET *');
+	
 	app.get('*',function(req,res){
 		res.end('404 not found')
 	})
