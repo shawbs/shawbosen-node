@@ -6,11 +6,10 @@ const secret = md5('sgdy$');
  * 生成token
  * @param {number} hours 
  */
-const getToken = function(hours){
-    hours = hours || 10;
+const getToken = function(key,hours = 10){
     let token = jwt.sign(
         {
-            content:'shawbosen',
+            content: key || 'shawbosen',
             iat:Math.floor(Date.now() / 1000) + (60 * 60),
         }, md5(secret),
         {
@@ -24,8 +23,8 @@ const getToken = function(hours){
  * 生成refreshtoken
  * @param {number} hours 
  */
-const getRefreshtoken = function(hours){
-    hours = hours || 10;
+const getRefreshtoken = function(hours=10){
+
     let token = jwt.sign(
         {
             content: "refreshtoken",

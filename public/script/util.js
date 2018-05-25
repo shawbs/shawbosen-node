@@ -36,7 +36,7 @@ const ArrFilter = function(Arr,key){
 
 const OFilter = function(o,...key){
     let result = Object.assign({},o._doc)
-    console.log(result)
+    // console.log(result)
     for(let i of key){
         delete result[i]   
     }

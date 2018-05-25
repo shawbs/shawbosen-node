@@ -6,7 +6,9 @@
         this.nickname = user.nickname;
         this.desc = user.desc;
         this.avatar = user.avatar;
-        this.meta = user.meta;
+        this.startWorkDate = user.startWorkDate;
+        this.createAt = user.createAt;
+        this.updateAt = user.updateAt;
     }
 }
 
@@ -20,7 +22,8 @@
         this.private = article.private;
         this.author = article.author;
         this.content = article.content;
-        this.meta = article.meta;
+        this.createAt = article.createAt;
+        this.updateAt = article.updateAt;
     }
 }
 

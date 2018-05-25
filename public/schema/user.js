@@ -1,20 +1,25 @@
 
+
+
 const Mongoose = require('mongoose')
 
 const UserSchema = new Mongoose.Schema({
     username: {
         type: String,
-        default: ''
+        required: [true, 'username field is required']
     },
     password: {
         type: String,
-        default: ''
+        required: [true, 'password field is required']
     },
     nickname: {
         type: String,
         default: ''
     },
-    startWorkDate: Date,
+    startWorkDate: {
+        type: Number,
+        default: 0
+    },
     desc: {
         type: String,
         default: ''
@@ -23,31 +28,30 @@ const UserSchema = new Mongoose.Schema({
         type: String,
         default: ''
     },
-    meta: {
-        createAt: {
-            type: Date,
-            default: Date.now()
-        },
-        updateAt: {
-            type: Date,
-            default: Date.now()
-        }
+    createAt: {
+        type: Date,
+        default: Date.now()
+    },
+    updateAt: {
+        type: Date,
+        default: Date.now()
     }
+
 })
 
 //pre是每次调用save方法都执行这个方法体
 UserSchema.pre('save', function(next){
     if(this.isNew){
-        this.meta.createAt = this.meta.updateAt = Date.now()
+        this.createAt = this.updateAt = Date.now()
     }else{
-        this.meta.updateAt = Date.now()
+        this.updateAt = Date.now()
     }
     next()
 })
 
 UserSchema.statics = {
     fetch: function(cb){
-        return this.find({}).sort('meta.updateAt').exec(cb)
+        return this.find({}).sort('updateAt').exec(cb)
     },
     fetchById: function(id,cb){
         return this.findOne({

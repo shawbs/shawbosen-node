@@ -116,7 +116,7 @@ const getTags = function(req,res){
     Actricle.fetchColumn({_id:0,tag:1,tagColor: 1},(err,data)=>{
         assert.ifError(err);
         let arr = [];
-        console.log(data)
+        // console.log(data)
         for(let item of data){
             if(!!item){
                 arr.push(item)

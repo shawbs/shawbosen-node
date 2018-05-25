@@ -14,31 +14,29 @@ const ActricleSchema = new Mongoose.Schema({
         type: Boolean,
         default: false
     },
-    meta: {
-        createAt: {
-            type: Date,
-            default: Date.now()
-        },
-        updateAt: {
-            type: Date,
-            default: Date.now()
-        }
+    createAt: {
+        type: Date,
+        default: Date.now()
+    },
+    updateAt: {
+        type: Date,
+        default: Date.now()
     }
 })
 
 //pre是每次调用save方法都执行这个方法体
 ActricleSchema.pre('save', function(next){
     if(this.isNew){
-        this.meta.createAt = this.meta.updateAt = Date.now()
+        this.createAt = this.updateAt = Date.now()
     }else{
-        this.meta.updateAt = Date.now()
+        this.updateAt = Date.now()
     }
     next()
 })
 
 ActricleSchema.statics = {
     fetch: function(cb){
-        return this.find({}).sort({'meta.updateAt':-1}).exec(cb)
+        return this.find({}).sort({'updateAt':-1}).exec(cb)
     },
     fetchColumn: function(option,cb){
         return this.find({},option).exec(cb)

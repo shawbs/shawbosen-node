@@ -9,6 +9,7 @@ const MiddleVerifyToken = function(req,res,next){
     let accessToken = req.headers['accesstoken'];
     if(accessToken){
         let {decoded,exType} = JWT.decodeToken(accessToken);
+        // console.log(decoded,exType)
         if(exType == 1){
             next();
         }else if(exType == 2){
