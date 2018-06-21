@@ -35,7 +35,7 @@ const addActricle = function(req,res){
 
     actricle.save((err,actricle)=>{
         assert.ifError(err);
-        res.json(result.sucess({msg:'添加成功'}))
+        res.json(result.sucess({data: new Mode.Article(actricle), msg:'添加成功'}))
     })
 }
 
@@ -65,7 +65,7 @@ const updateActricle = function(req,res){
         let _actricle = Object.assign(actricle,actricleObj)
         _actricle.save((err,actricle)=>{
             assert.ifError(err);
-            res.json(result.sucess({msg:'更新成功'}))
+            res.json(result.sucess({data: new Mode.Article(actricle), msg:'更新成功'}))
         })
     })
 
